@@ -7,32 +7,30 @@
 * Date        : 2017/10/17
 **********************************************************************/
 
-#include <wiringPi.h>
-#include <softPwm.h>
+#include <pigpio.h>
 #include <stdio.h>
+#include <unistd.h>
 
-#define LedPin    1
+#define LedPin    18
 
 int main(void)
 {
 	int i;
 
-	if(wiringPiSetup() == -1){ //when initialize wiring failed,print messageto screen
+	if(gpioInitialise() < 0){ //when initialize wiring failed,print messageto screen
 		printf("setup wiringPi failed !");
 		return 1;
 	}
 
-	softPwmCreate(LedPin, 0, 100);
-
 	while(1){
-		for(i=0;i<=100;i++){
-			softPwmWrite(LedPin, i);
-			delay(20);
+		for(i=0;i<=255;i++){
+			gpioPWM(LedPin, i);
+			sleep(1);
 		}
-		delay(1000);
-		for(i=100;i>=0;i--){
-			softPwmWrite(LedPin, i);
-			delay(20);
+		sleep(1);
+		for(i=255;i>=0;i--){
+			gpioPWM(LedPin, i);
+			sleep(1);
 		}
 	}
 

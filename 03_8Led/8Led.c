@@ -1,46 +1,49 @@
-#include <wiringPi.h>
+#include <pigpio.h>
 #include <stdio.h>
+#include <unistd.h>
 
 //make led_n on
 void led_on(int n)
 {
-	digitalWrite(n, LOW);
+	gpioWrite(n, 0);
 }
 
 //make led_n off
 void led_off(int n)
 {
-	digitalWrite(n, HIGH);
+	gpioWrite(n, 1);
 }
 
+int leds[8] = { 17, 18, 27, 22, 23, 24, 25, 4 };
 int main(void)
 {
 	int i;
 
-	if(wiringPiSetup() == -1){ //when initialize wiring failed,print messageto screen
-		printf("setup wiringPi failed !");
-		return 1; 
+	if(gpioInitialise() < 0){ //when initialize wiring failed,print messageto screen
+		printf("setup failed !");
+		return 1;
 	}
 
 	for(i=0;i<8;i++){
-		printf("linker LedPin : GPIO %d(wiringPi pin)\n",i); //when initialize wiring successfully,print message to screen
+		printf("linker LedPin : GPIO %d(wiringPi pin) -> %d\n",i, leds[i]); //when initialize wiring successfully,print message to screen
 	}
 
 	for(i=0;i<8;i++){       //make 8 pins' mode is output
-		pinMode(i, OUTPUT);
+		gpioSetMode(leds[i], PI_OUTPUT);
+		led_off(leds[i]);
 	}
 
 	while(1){
 		for(i=0;i<8;i++){   //make led on from left to right
-			led_on(i);
-			delay(100);
-			led_off(i);
+			led_on(leds[i]);
+			sleep(1);
+			led_off(leds[i]);
 		}
-	//	delay(500);
+		sleep(1);
 		for(i=8;i>=0;i--){  //make led off from right to left
-			led_on(i);
-			delay(100);
-			led_off(i);
+			led_on(leds[i]);
+			sleep(1);
+			led_off(leds[i]);
 		}
 	}
 

@@ -10,11 +10,12 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <wiringPi.h>
+#include <pigpio.h>
+#include <unistd.h>
 
-#define  RoAPin    0
-#define  RoBPin    1
-#define  RoSPin    2
+#define  RoAPin    17
+#define  RoBPin    18
+#define  RoSPin    27
 
 static volatile int globalCounter = 0 ;
 
@@ -24,10 +25,10 @@ unsigned char Current_RoB_Status;
 
 void rotaryDeal(void)
 {
-	Last_RoB_Status = digitalRead(RoBPin);
+	Last_RoB_Status = gpioRead(RoBPin);
 
-	while(!digitalRead(RoAPin)){
-		Current_RoB_Status = digitalRead(RoBPin);
+	while(!gpioRead(RoAPin)){
+		Current_RoB_Status = gpioRead(RoBPin);
 		flag = 1;
 	}
 
@@ -47,26 +48,26 @@ void rotaryDeal(void)
 
 void rotaryClear(void)
 {
-	if(digitalRead(RoSPin) == 0)
+	if(gpioRead(RoSPin) == 0)
 	{
 		globalCounter = 0;
 		printf("globalCounter : %d\n",globalCounter);
-		delay(1000);
+		sleep(1);
 	}
 }
 
 int main(void)
 {
-	if(wiringPiSetup() < 0){
+	if(gpioInitialise() < 0){
 		fprintf(stderr, "Unable to setup wiringPi:%s\n",strerror(errno));
 		return 1;
 	}
 
-	pinMode(RoAPin, INPUT);
-	pinMode(RoBPin, INPUT);
-	pinMode(RoSPin, INPUT);
+	gpioSetMode(RoAPin, PI_INPUT);
+	gpioSetMode(RoBPin, PI_INPUT);
+	gpioSetMode(RoSPin, PI_INPUT);
 
-	pullUpDnControl(RoSPin, PUD_UP);
+	gpioSetPullUpDown(RoSPin, PI_PUD_UP);
 
 	while(1){
 		rotaryDeal();

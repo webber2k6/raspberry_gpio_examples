@@ -6,28 +6,30 @@
 * website     : www.sunfounder.com
 * Date        : 2014/08/27
 **********************************************************************/
-#include <wiringPi.h>
+#include <pigpio.h>
 #include <stdio.h>
+#include <unistd.h>
 
-#define  LedPin    0
+#define  LedPin    17
 
 int main(void)
 {
-	if(wiringPiSetup() == -1){ //when initialize wiring failed,print messageto screen
+	if (gpioInitialise() < 0)
+        { //when initialize failed, print message
 		printf("setup wiringPi failed !");
-		return 1; 
+		return 1;
 	}
-	printf("linker LedPin : GPIO %d(wiringPi pin)\n",LedPin); //when initialize wiring successfully,print message to screen
-	
-	pinMode(LedPin, OUTPUT);
+
+	printf("linker LedPin : GPIO %d(wiringPi pin)\n", LedPin);
+	gpioSetMode(LedPin, PI_OUTPUT);
 
 	while(1){
-			digitalWrite(LedPin, LOW);  //led on
+			gpioWrite(LedPin, 0);  //led on
 			printf("led on...\n");
-			delay(500);
-			digitalWrite(LedPin, HIGH);  //led off
+			sleep(5);
+			gpioWrite(LedPin, 1);  //led off
 			printf("...led off\n");
-			delay(500);
+			sleep(5);
 	}
 
 	return 0;

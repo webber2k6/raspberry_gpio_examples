@@ -6,63 +6,55 @@
 * website     : www.sunfounder.com
 * Date        : 2014/08/27
 **********************************************************************/
-#include <wiringPi.h>
-#include <softPwm.h>
+#include <pigpio.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #define uchar unsigned char
 
-#define LedPinRed    0
-#define LedPinGreen  1
-#define LedPinBlue   2
+#define LedPinRed    17
+#define LedPinGreen  18
+#define LedPinBlue   27
 
-void ledInit(void)
+void ledColorSet(unsigned r_val, unsigned g_val, unsigned b_val)
 {
-	softPwmCreate(LedPinRed,  0, 100);
-	softPwmCreate(LedPinGreen,0, 100);
-	softPwmCreate(LedPinBlue, 0, 100);
-}
-
-void ledColorSet(uchar r_val, uchar g_val, uchar b_val)
-{
-	softPwmWrite(LedPinRed,   r_val);
-	softPwmWrite(LedPinGreen, g_val);
-	softPwmWrite(LedPinBlue,  b_val);
+	printf("R - %d, G - %d, B - %d\n", r_val, g_val, b_val);
+	gpioPWM(LedPinRed,   r_val);
+	gpioPWM(LedPinGreen, g_val);
+	gpioPWM(LedPinBlue,  b_val);
 }
 
 int main(void)
 {
 	int i;
 
-	if(wiringPiSetup() == -1){ //when initialize wiring failed,print messageto screen
+	if(gpioInitialise() < 0){ //when initialize wiring failed,print messageto screen
 		printf("setup wiringPi failed !");
-		return 1; 
+		return 1;
 	}
 	//printf("linker LedPin : GPIO %d(wiringPi pin)\n",LedPin); //when initialize wiring successfully,print message to screen
 
-	ledInit();
-
 	while(1){
-		ledColorSet(0xff,0x00,0x00);   //red	
-		delay(500);
-		ledColorSet(0x00,0xff,0x00);   //green
-		delay(500);
-		ledColorSet(0x00,0x00,0xff);   //blue
-		delay(500);
+		ledColorSet(255,0,0);   //red
+		sleep(1);
+		ledColorSet(0,255,0);   //green
+		sleep(1);
+		ledColorSet(0,0,255);   //blue
+		sleep(1);
 
-		ledColorSet(0xff,0xff,0x00);   //yellow
-		delay(500);
-		ledColorSet(0xff,0x00,0xff);   //pick
-		delay(500);
-		ledColorSet(0xc0,0xff,0x3e);
-		delay(500);
+		ledColorSet(255,255,0);   //yellow
+		sleep(1);
+		ledColorSet(255,0,255);   //pick
+		sleep(1);
+		ledColorSet(192,255,62);
+		sleep(1);
 
-		ledColorSet(0x94,0x00,0xd3);
-		delay(500);
-		ledColorSet(0x76,0xee,0x00);
-		delay(500);
-		ledColorSet(0x00,0xc5,0xcd);	
-		delay(500);
+		ledColorSet(148,0,211);
+		sleep(1);
+		ledColorSet(118,238,0);
+		sleep(1);
+		ledColorSet(0,197,205);
+		sleep(1);
 
 	}
 

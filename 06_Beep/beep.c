@@ -6,25 +6,29 @@
 * website     : www.sunfounder.com
 * Date        : 2014/08/27
 **********************************************************************/
-#include <wiringPi.h>
+#include <pigpio.h>
 #include <stdio.h>
+#include <unistd.h>
 
-#define BeepPin 0
+#define BeepPin 18
 
 int main(void)
 {
-	if(wiringPiSetup() == -1){ //when initialize wiring failed,print messageto screen
+	if(gpioInitialise() < 0){ //when initialize wiring failed,print messageto screen
 		printf("setup wiringPi failed !");
-		return 1; 
+		return 1;
 	}
-	
-	pinMode(BeepPin, OUTPUT);   //set GPIO0 output
+
+	gpioSetMode(BeepPin, PI_OUTPUT);   //set GPIO0 output
 
 	while(1){
-		digitalWrite(BeepPin, LOW);  //beep on
-		delay(100);                  //delay
-		digitalWrite(BeepPin, HIGH); //beep off
-		delay(100);                  //delay
+		printf("Beep!");
+		gpioWrite(BeepPin, 0);  //beep on
+		sleep(1);                  //delay
+
+		printf("Stop!");
+		gpioWrite(BeepPin, 1); //beep off
+		sleep(2);                  //delay
 	}
 
 	return 0;
